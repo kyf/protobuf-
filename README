@@ -1,0 +1,35 @@
+本文主要讲述安装protobuf、protoc、protoc-gen-go和protoc-gen-grpc-java安装步骤以及遇到的各种坑。
+part1--protobuf:
+1、可从https://github.com/google/protobuf获取最新版本的protobuf源码
+2、cd $PROTOBUF(protobuf目录)
+3、运行autogen.sh（需要预先安装autoconf）
+   这一步中需要下载gmock.zip,autogen.sh中的地址可能不能下载，修改autogen.sh如下部分：
+   if test ! -e gmock; then                                                                                                                                                        
+     echo "Google Mock not present.  Fetching gmock-1.7.0 from the web..."
+	 #curl $curlopts -O https://googlemock.googlecode.com/files/gmock-1.7.0.zip
+	 wget https://github.com/google/googletest/archive/release-1.7.0.zip
+	 mv -v release-1.7.0.zip gmock-1.7.0.zip
+	 unzip -q gmock-1.7.0.zip
+	 rm gmock-1.7.0.zip
+	 mv googletest-release-1.7.0 gmock
+   fi
+
+4、接下来就是./configure、make、make install   
+5、ldconfig(刷新链接库缓存)
+
+part2--protoc-gen-go:
+1、go get -u github.com/golang/protobuf/proto
+2、go get -u github.com/golang/protobuf/protoc-gen-go
+3、记得把$GOPATH/bin加入环境变量
+
+part3-protoc-gen-grpc-java:
+1、获取源码https://github.com/grpc/grpc-java
+2、cd $GRPC_JAVA/compiler
+3、../gradlew java_pluginExecutable
+  这一步可能出现的错误：
+  1）、 致命错误：google/protobuf/io/zero_copy_stream.h：没有那个文件或目录--》找不到protobuf-devel的header文件，所以protobuf最好是编译安装，rpm安装的话需要，注意rpm的源版本
+  2）、致命错误：google/protobuf/compiler/java/java_names.h：没有那个文件或目录--》同上
+  3）、/usr/bin/ld: cannot find -lstdc++ --》安装compat-libstdc++-33   libstdc++-docs     libstdc++-static   即可
+
+安装过程中大致的坑我遇到的就是这些，以后有新的话在补充。
+
